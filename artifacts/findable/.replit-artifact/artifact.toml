@@ -1,0 +1,28 @@
+kind = "web"
+previewPath = "/"
+title = "FindAble"
+description = "A mobile-first discovery app helping Deaf people find places with accessible communication. Browse sample institutions, compare accessibility features, view details, and submit place information."
+version = "1.0.0"
+id = "artifacts/findable"
+router = "path"
+
+[[services]]
+name = "web"
+paths = [ "/" ]
+localPort = 21503
+
+[services.development]
+run = "pnpm --filter @workspace/findable run dev"
+
+[services.production]
+build = [ "pnpm", "--filter", "@workspace/findable", "run", "build" ]
+serve = "static"
+publicDir = "artifacts/findable/dist/public"
+
+[[services.production.rewrites]]
+from = "/*"
+to = "/index.html"
+
+[services.env]
+PORT = "21503"
+BASE_PATH = "/"

@@ -1,0 +1,232 @@
+Build a polished, mobile-first web app prototype called "FindAble".
+
+CORE PURPOSE:
+FindAble helps Deaf people find institutions and services where communication is accessible to them.
+
+The main problem being solved is that Deaf people may struggle to know which schools, healthcare facilities, government offices, businesses, and other institutions are prepared to communicate with them.
+
+IMPORTANT:
+This is NOT primarily a Kenyan Sign Language learning app.
+The core journey is:
+Find a service → search for accessible institutions → compare accessibility information → view institution details → contact/navigate to the institution.
+
+Create a realistic, polished prototype that can be demonstrated in a browser. No backend, authentication, database, or real API is necessary. Use realistic sample data and make all navigation functional on the frontend.
+
+DESIGN:
+- Mobile-first design.
+- Make it look like a modern accessibility-focused startup.
+- Clean, professional, welcoming interface.
+- Strong readability and accessible contrast.
+- Rounded cards and buttons.
+- Clear visual hierarchy.
+- Use simple accessibility-related icons where appropriate.
+- Avoid excessive animations or decoration.
+- Make the interface feel suitable for a real product, not a generic dashboard.
+- The primary viewport should resemble a modern smartphone.
+- Make the app responsive on desktop as well.
+
+APP STRUCTURE:
+
+SCREEN 1 — HOME
+
+Header:
+FindAble
+
+Tagline:
+"Find places where communication is accessible."
+
+Add a prominent search bar:
+"What service are you looking for?"
+
+Add a location control:
+"📍 Use my location"
+
+Section heading:
+"Find accessible services"
+
+Create four category cards:
+- Healthcare
+- Schools
+- Government Services
+- Businesses
+
+Each category should be clickable and take the user to the search/results experience.
+
+Add a secondary action:
+"＋ Add or Report a Place"
+
+Add a small explanatory section:
+"FindAble helps you discover places that offer accessible communication and services for Deaf people."
+
+SCREEN 2 — FIND A SERVICE
+
+Heading:
+"Find a Service"
+
+Search field:
+"Search for a place or service"
+
+Location:
+"📍 Nairobi, Kenya"
+
+Section:
+"What type of service do you need?"
+
+Category buttons:
+- Healthcare
+- Schools
+- Government Services
+- Businesses
+- Other Services
+
+Add accessibility filters:
+- KSL Support
+- Deaf-Friendly Staff
+- Interpreter Available
+- Accessible Information
+
+Add a prominent:
+"Search"
+
+When the user selects a category or presses Search, navigate to Screen 3.
+
+SCREEN 3 — SEARCH RESULTS
+
+Heading:
+"Accessible Places"
+
+Show a list of realistic SAMPLE institutions.
+
+IMPORTANT:
+Clearly treat these as prototype/sample data. Do not claim that real institutions actually provide these accessibility services unless verified.
+
+Each institution card should contain:
+- Institution name
+- Service category
+- General location
+- Accessibility badges
+- "View Details" button
+
+Example sample institutions:
+"HopeCare Medical Centre"
+Category: Healthcare
+Location: Nairobi
+Accessibility:
+✓ KSL Support
+✓ Deaf-Friendly Staff
+✓ Accessible Information
+
+"BrightPath Academy"
+Category: School
+Location: Nairobi
+Accessibility:
+✓ KSL Support
+✓ Accessible Information
+
+"Community Access Centre"
+Category: Government Services
+Location: Nairobi
+Accessibility:
+✓ Interpreter Available
+✓ Deaf-Friendly Staff
+
+Clicking "View Details" opens Screen 4.
+
+SCREEN 4 — INSTITUTION DETAILS
+
+Create a detailed institution profile.
+
+Example:
+HopeCare Medical Centre
+
+Healthcare
+📍 Nairobi
+
+Sections:
+
+CONTACT
+Phone
+Email
+Opening Hours
+
+ACCESSIBILITY
+✓ Kenyan Sign Language support
+✓ Staff trained in Deaf communication
+✓ Accessible information
+✓ Interpreter available
+
+ABOUT:
+"Sample information for this prototype. Accessibility information can be verified and updated by users and institutions."
+
+Buttons:
+"Get Directions"
+"Contact Institution"
+"Report Incorrect Information"
+
+Make the buttons functional within the prototype. For example, clicking Get Directions can display a simple confirmation/modal rather than opening a real map.
+
+Include a back button to return to Search Results.
+
+SCREEN 5 — ADD / REPORT A PLACE
+
+Heading:
+"Help Make Places More Accessible"
+
+Text:
+"Know a place that supports Deaf people? Help others find it."
+
+Create a simple form:
+
+Institution Name
+Category
+Location
+Phone / Contact
+Accessibility Features
+
+Checkboxes:
+□ KSL Support
+□ Deaf-Friendly Staff
+□ Interpreter Available
+□ Accessible Information
+
+Additional field:
+"Tell us anything else about accessibility at this place."
+
+Buttons:
+"Submit Place"
+"Report an Accessibility Issue"
+
+After submitting, show a confirmation message:
+"Thank you! Your contribution can help someone find a more accessible place."
+
+NAVIGATION:
+Create a simple consistent navigation system.
+
+Main flow:
+Home → Find a Service → Search Results → Institution Details
+
+Home → Add/Report a Place → Screen 5
+
+Include back navigation where appropriate.
+
+ACCESSIBILITY:
+- Use readable font sizes.
+- Use clear labels.
+- Don't rely only on color to communicate information.
+- Use icons alongside text where useful.
+- Make buttons large enough to tap comfortably.
+- Maintain strong contrast.
+
+TECHNICAL:
+- Build with a clean component structure.
+- Use React if appropriate.
+- Keep everything frontend-only.
+- No authentication.
+- No database.
+- No external API keys.
+- Use sample/mock data.
+- Ensure the app runs immediately in Replit.
+- Make the interface responsive.
+- Make navigation and interactions actually work.
+
+The finished result should clearly communicate that FindAble is an accessibility-discovery platform for Deaf people, not a KSL learning platform.
