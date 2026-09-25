@@ -1,0 +1,512 @@
+I want you to improve the EXISTING FindAble application you already built. Do NOT rebuild the app from scratch and do NOT replace the current design unnecessarily.
+
+FindAble is an accessibility discovery platform for Deaf users. Its purpose is to help users DISCOVER, EVALUATE, COMPARE, and TRUST institutions based on their accessibility features BEFORE visiting them.
+
+IMPORTANT PRODUCT DIRECTION:
+FindAble is NOT a KSL learning app, social network, chat platform, AI translator, video-calling app, or communication-learning platform.
+
+The core experience must remain:
+
+HOME → SEARCH → ACCESSIBLE INSTITUTION RESULTS → INSTITUTION PROFILE → ACCESSIBILITY DETAILS → SAVE / DIRECTIONS / CONTACT → COMMUNITY FEEDBACK
+
+Use the existing components, routes, data structures, styling system, and functionality wherever possible. Modify and extend them instead of creating duplicate pages or rewriting working features.
+
+==================================================
+1. HOMEPAGE
+==================================================
+
+Improve the homepage so the purpose of FindAble is immediately obvious.
+
+Hero heading:
+"Find a place where you'll be understood."
+
+Supporting text:
+"Discover businesses, healthcare facilities, schools, government offices and other institutions with accessibility information for Deaf users."
+
+Primary CTA:
+"Search accessible services"
+
+The homepage should also have a clear category section:
+
+"What are you looking for?"
+
+Categories:
+- Healthcare
+- Education
+- Government
+- Banking
+- Restaurants
+- Businesses
+- Hotels
+- More
+
+Each category should lead into the search/results experience using the existing routing system.
+
+Keep the existing FindAble branding and overall visual identity. Do not redesign the entire application unless necessary.
+
+==================================================
+2. IMPROVE SEARCH
+==================================================
+
+Make search one of the strongest parts of the application.
+
+Users should be able to search by:
+
+- Institution name
+- Location
+- Category
+
+Add an accessibility filter section titled:
+
+"What accessibility do you need?"
+
+Filters:
+- Sign-language proficient staff
+- Written communication
+- Visual communication
+- Remote interpreting
+- Accessible customer service
+- Emergency communication support
+
+Keep the search interface simple and accessible.
+
+The search results should update based on selected filters using the existing demo data.
+
+If the current application already has search/filter functionality, improve it rather than replacing it.
+
+==================================================
+3. IMPROVE INSTITUTION RESULT CARDS
+==================================================
+
+Make accessibility information more prominent than generic business information.
+
+Each institution card should show:
+
+- Institution name
+- Category
+- Location
+- Verification status
+- Accessibility features
+- Community rating
+- Number of reviews
+- View Profile button
+- Save button
+
+Example structure:
+
+Nairobi Hospital
+Healthcare
+
+🟢 Verified
+
+Accessibility:
+✓ Sign-language proficient staff
+✓ Written communication
+✓ Visual communication
+✓ Remote interpreting
+
+⭐ 4.6
+32 community reviews
+
+[View Profile] [Save]
+
+Do NOT label every institution as Verified.
+
+Use different demo statuses:
+
+🟢 Verified
+🔵 Community Reported
+🟡 Pending Verification
+
+Clearly distinguish these statuses.
+
+==================================================
+4. VERIFICATION SYSTEM
+==================================================
+
+Add a clear verification system throughout the application.
+
+Use exactly these statuses:
+
+1. Verified
+2. Community Reported
+3. Pending Verification
+
+Add a small explanation wherever appropriate.
+
+For example:
+
+Verified:
+"Accessibility information has been reviewed through FindAble's verification process."
+
+Community Reported:
+"Accessibility information has been submitted by the FindAble community and has not yet received full verification."
+
+Pending Verification:
+"Accessibility information is currently being reviewed."
+
+Add a "Why is this information trusted?" section to institution profiles.
+
+Example:
+
+Why this information can be trusted
+
+✓ Institution accessibility information submitted
+✓ Community feedback received
+✓ Accessibility information reviewed
+Last reviewed: August 2026
+
+Keep these as DEMO/PROTOTYPE states. Do not falsely imply that real institutions have actually been verified by FindAble.
+
+==================================================
+5. IMPROVE INSTITUTION PROFILE PAGE
+==================================================
+
+This should be one of the strongest pages in the application.
+
+Keep the existing institution information but make accessibility the primary focus.
+
+Profile structure:
+
+Institution name
+Category
+Location
+Verification badge
+
+Then:
+
+"Accessibility at this institution"
+
+Display an accessibility checklist/table with:
+
+- Sign-language proficient staff
+- Written communication
+- Visual communication
+- Remote interpreting
+- Emergency communication
+- Deaf-awareness training
+
+Each feature should have a clear status such as:
+
+✓ Available
+⚠ Limited
+— Information unavailable
+
+IMPORTANT:
+"Information unavailable" must NOT mean "Not accessible."
+
+Then include:
+
+"Community feedback"
+
+Show a demo community rating and several clearly labeled DEMO/SAMPLE reviews.
+
+Example:
+
+⭐ 4.6
+Based on 32 community reviews
+
+Communication: ⭐⭐⭐⭐⭐
+Staff understanding: ⭐⭐⭐⭐
+Overall experience: ⭐⭐⭐⭐⭐
+
+Sample review:
+"Staff were patient and allowed me to communicate through writing."
+
+Clearly label demo/sample content so it is not presented as real verified user testimony.
+
+Buttons:
+
+[Save Place]
+[Get Directions]
+[Contact Institution]
+
+Also add:
+
+"Report incorrect information"
+
+==================================================
+6. SAVE / FAVORITES
+==================================================
+
+Implement the Favorites/Saved Places feature using simple local browser state/localStorage if authentication is not already implemented.
+
+Users should be able to:
+
+- Save an institution
+- Unsave an institution
+- See the saved state immediately
+- Open a "Saved Places" page/section
+
+Create a useful empty state:
+
+"No saved places yet."
+
+"Save accessible places here so you can find them quickly later."
+
+Do not build a complicated authentication system just for this feature.
+
+==================================================
+7. GET DIRECTIONS
+==================================================
+
+Keep the existing Get Directions functionality if present.
+
+Improve it so clicking the button produces a useful lightweight directions experience.
+
+It can be a modal or dedicated section showing:
+
+Institution name
+Address
+Location/map-style visual if already available
+
+Button:
+"Open directions"
+
+Do NOT build a complicated custom mapping system.
+
+The goal is simply to demonstrate the Maps & Directions feature described in the FindAble concept.
+
+==================================================
+8. COMMUNITY FEEDBACK
+==================================================
+
+Add a clear "Leave feedback" interaction.
+
+The feedback interface should allow a user to provide:
+
+- Overall experience rating
+- Communication rating
+- Staff understanding rating
+- Written feedback
+
+For the prototype, the submitted feedback can be stored locally.
+
+Make it clear that this is prototype/demo functionality.
+
+Also include:
+
+"Report incorrect accessibility information"
+
+This supports the community verification model.
+
+==================================================
+9. CONTRIBUTE TO FINDABLE
+==================================================
+
+If the current app has an Add Institution or similar feature, improve it.
+
+Create a simple:
+
+"Contribute to FindAble"
+
+page/modal with two options:
+
++ Add a place
+
+"Tell us about an institution that provides accessible services."
+
+and:
+
+⚠ Report incorrect information
+
+"Help us keep accessibility information accurate."
+
+For Add a Place, collect:
+
+- Institution name
+- Category
+- Location
+- Contact/website
+- Accessibility features
+
+Accessibility features:
+
+☐ Sign-language proficient staff
+☐ Written communication
+☐ Visual communication
+☐ Remote interpreting
+☐ Emergency communication
+☐ Deaf-awareness training
+
+Do not create a complicated backend if one does not already exist. Demo/local state is sufficient for this prototype.
+
+==================================================
+10. ACCESSIBILITY INDICATORS
+==================================================
+
+Use a consistent accessibility status system throughout the application.
+
+Available = ✓
+Limited = ⚠
+Information unavailable = —
+
+Add a small legend where useful:
+
+Accessibility indicators
+
+✓ Available
+⚠ Limited
+— Information unavailable
+
+Do not communicate important information using color alone. Always use text/icons as well.
+
+==================================================
+11. OPTIONAL COMPARISON FEATURE
+==================================================
+
+If it can be implemented without significantly restructuring the existing application, add a simple "Compare" option to institution cards.
+
+Users should be able to select up to 2 institutions.
+
+Comparison should focus on accessibility:
+
+Institution
+Verification
+Sign-language proficient staff
+Written communication
+Visual communication
+Remote interpreting
+Emergency communication
+Community rating
+
+If implementing this would require major restructuring, SKIP IT. The core search/profile experience is more important.
+
+==================================================
+12. DEMO DATA
+==================================================
+
+Improve the demo institution data so there are several different categories:
+
+- Healthcare
+- Education
+- Government
+- Banking
+- Restaurants
+- Businesses
+- Hotels
+
+Use realistic but clearly DEMO data.
+
+Do not claim that real institutions have been officially verified by FindAble.
+
+Use a mixture of:
+
+🟢 Verified
+🔵 Community Reported
+🟡 Pending Verification
+
+This should demonstrate how the platform would work as it grows.
+
+==================================================
+13. ACCESSIBILITY OF FINDABLE ITSELF
+==================================================
+
+Make sure the FindAble interface itself follows good accessibility principles:
+
+- Clear readable typography
+- Strong text/background contrast
+- Large enough buttons
+- Clear labels
+- Visible focus states
+- Keyboard-friendly controls
+- Do not rely on color alone
+- Responsive mobile layout
+- Clear error and success messages
+- Consistent icons and terminology
+
+The application should work especially well on mobile because the primary use case involves someone searching for a service while away from home.
+
+==================================================
+14. NAVIGATION
+==================================================
+
+Keep navigation simple.
+
+The main navigation should provide access to the important product areas, such as:
+
+Home
+Discover/Search
+Saved Places
+Contribute
+
+Do not add unnecessary sections.
+
+Make sure every major CTA works.
+
+==================================================
+15. IMPORTANT PRODUCT RULES
+==================================================
+
+DO NOT add:
+
+- KSL lessons
+- Sign-language courses
+- KSL dictionary
+- Chat
+- Social networking
+- Messaging
+- AI translation
+- Video calling
+- Deaf friendship/community matching
+- Communication practice tools
+
+These would move the product away from its core concept.
+
+FindAble's unique value is:
+
+"Helping Deaf people discover places where they can expect accessible communication before they arrive."
+
+==================================================
+16. PROTOTYPE SAFETY
+==================================================
+
+This is an ALA application prototype, not a production platform.
+
+Do not spend time building complex authentication, payment systems, advanced backend infrastructure, or unnecessary APIs.
+
+Prioritize:
+
+1. Clear user journey
+2. Search
+3. Accessibility filters
+4. Institution profiles
+5. Verification
+6. Community feedback
+7. Save
+8. Directions
+9. Contribute/report
+
+Use local/demo data where appropriate.
+
+==================================================
+17. FINAL QUALITY CHECK
+==================================================
+
+Before finishing, test the entire user journey:
+
+HOME
+→ Search accessible services
+→ Apply accessibility filters
+→ View results
+→ Open institution
+→ View accessibility details
+→ Understand verification status
+→ Read community feedback
+→ Save institution
+→ Open saved places
+→ Get directions
+→ Contact institution
+→ Leave feedback
+→ Report incorrect information
+→ Add a place
+
+Fix broken buttons, dead links, layout issues, inconsistent labels, overflow, mobile problems, and duplicated components.
+
+Do not rebuild working features unnecessarily.
+
+The final prototype should make the following concept immediately understandable:
+
+"FindAble helps Deaf people discover, evaluate, and trust accessible institutions before they visit them."
+
+Most importantly, make ACCESSIBILITY INFORMATION the central product feature, not a small detail attached to ordinary business listings.
