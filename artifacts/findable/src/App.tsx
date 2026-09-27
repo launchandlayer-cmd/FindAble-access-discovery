@@ -1,4 +1,5 @@
 import { useEffect, useMemo, useState, type Dispatch, type FormEvent, type ReactNode, type SetStateAction } from 'react';
+import { useAuth, type AuthUser } from '@workspace/replit-auth-web';
 import {
   AlertTriangle,
   Accessibility,
@@ -34,7 +35,7 @@ import {
   X,
 } from 'lucide-react';
 
-type Screen = 'home' | 'search' | 'results' | 'details' | 'saved' | 'feedback' | 'contribute';
+type Screen = 'home' | 'search' | 'results' | 'details' | 'saved' | 'feedback' | 'contribute' | 'profile';
 type Category = 'Healthcare' | 'Education' | 'Government' | 'Banking' | 'Restaurants' | 'Businesses' | 'Hotels' | 'Other Services';
 type VerificationStatus = 'Verified' | 'Community Reported' | 'Pending Verification';
 type FeatureStatus = 'available' | 'limited' | 'unknown';
@@ -73,6 +74,25 @@ type CommunityFeedback = {
   staffUnderstanding: number;
   text: string;
   createdAt: string;
+};
+
+type UserReview = CommunityFeedback & {
+  userName: string;
+};
+
+type Profile = {
+  id: string;
+  name: string;
+  email: string | null;
+  createdAt: string;
+};
+
+type AuthState = {
+  user: AuthUser | null;
+  isLoading: boolean;
+  isAuthenticated: boolean;
+  login: () => void;
+  logout: () => void;
 };
 
 type AccessibilityReport = {
@@ -407,7 +427,7 @@ function useStoredState<T>(key: string, initialValue: T): [T, Dispatch<SetStateA
   return [value, setValue];
 }
 
-function Header({ navigate }: { navigate: (screen: Screen) => void }) {
+function Header({ navigate, auth }: { navigate: (screen: Screen) => void; auth: AuthState }) {
   const [menuOpen, setMenuOpen] = useState(false);
   const go = (screen: Screen) => {
     navigate(screen);
@@ -426,6 +446,7 @@ function Header({ navigate }: { navigate: (screen: Screen) => void }) {
         <button className="header-link" onClick={() => go('saved')}>Saved places</button>
         <button className="header-link" onClick={() => go('contribute')}>Contribute</button>
         <button className="pill-button" onClick={() => go('search')}><Compass size={16} /> Nairobi, Kenya</button>
+        {auth.isLoading ? <span className="account-loading" aria-label="Checking account status">Checking account…</span> : auth.isAuthenticated ? <button className="account-control" onClick={() => go('profile')}><span className="account-avatar">{(auth.user?.firstName ?? auth.user?.email ?? 'F').slice(0, 1).toUpperCase()}</span><span>{auth.user?.firstName || 'Account'}</span></button> : <><button className="header-link auth-link" onClick={auth.login}>Log in</button><button className="small-primary-button" onClick={auth.login}>Sign up</button></>}
         <button className="mobile-menu" aria-label={menuOpen ? 'Close navigation' : 'Open navigation'} aria-expanded={menuOpen} onClick={() => setMenuOpen((open) => !open)}>{menuOpen ? <X size={23} /> : <Menu size={23} />}</button>
       </nav>
     </header>
@@ -707,6 +728,7 @@ function RatingStars({ rating }: { rating: number }) {
 function Details({
   place,
   feedback,
+  reviews,
   isSaved,
   onToggleSaved,
   onBack,
@@ -717,6 +739,7 @@ function Details({
 }: {
   place: Place;
   feedback: CommunityFeedback[];
+  reviews: UserReview[];
   isSaved: boolean;
   onToggleSaved: () => void;
   onBack: () => void;
@@ -725,9 +748,10 @@ function Details({
   onReport: () => void;
   onFeedback: () => void;
 }) {
-  const ratingCount = (place.rating === null ? 0 : place.reviewCount) + feedback.length;
+  const allUserFeedback = [...feedback, ...reviews];
+  const ratingCount = (place.rating === null ? 0 : place.reviewCount) + allUserFeedback.length;
   const ratingValue = ratingCount === 0 ? null : (
-    ((place.rating ?? 0) * (place.rating === null ? 0 : place.reviewCount) + feedback.reduce((sum, item) => sum + item.overall, 0)) / ratingCount
+    ((place.rating ?? 0) * (place.rating === null ? 0 : place.reviewCount) + allUserFeedback.reduce((sum, item) => sum + item.overall, 0)) / ratingCount
   );
 
   return (
@@ -767,13 +791,14 @@ function Details({
           <div className="detail-section">
             <div className="section-title-row"><div><div className="eyebrow">Community feedback</div><h2>Experiences shared</h2></div><MessageSquareText size={22} /></div>
             <div className="community-rating">
-              {ratingValue === null ? <><strong>No community rating yet</strong><span>Be the first to share a prototype rating.</span></> : <><div className="community-rating-score"><RatingStars rating={ratingValue} /><strong>Based on {ratingCount} {ratingCount === 1 ? 'review' : 'community reviews'}</strong><span className="demo-inline-label">DEMO + LOCAL PROTOTYPE FEEDBACK</span></div><div className="rating-breakdown"><span>Communication <RatingStars rating={feedback.length ? feedback.reduce((sum, item) => sum + item.communication, 0) / feedback.length : Math.max(1, (place.rating ?? 0) - 0.1)} /></span><span>Staff understanding <RatingStars rating={feedback.length ? feedback.reduce((sum, item) => sum + item.staffUnderstanding, 0) / feedback.length : Math.max(1, (place.rating ?? 0) - 0.2)} /></span><span>Overall experience <RatingStars rating={ratingValue} /></span></div></>}
+              {ratingValue === null ? <><strong>No community rating yet</strong><span>Be the first to share your experience.</span></> : <><div className="community-rating-score"><RatingStars rating={ratingValue} /><strong>Based on {ratingCount} {ratingCount === 1 ? 'review' : 'community reviews'}</strong><span className="demo-inline-label">DEMO + MEMBER REVIEWS</span></div><div className="rating-breakdown"><span>Communication <RatingStars rating={allUserFeedback.length ? allUserFeedback.reduce((sum, item) => sum + item.communication, 0) / allUserFeedback.length : Math.max(1, (place.rating ?? 0) - 0.1)} /></span><span>Staff understanding <RatingStars rating={allUserFeedback.length ? allUserFeedback.reduce((sum, item) => sum + item.staffUnderstanding, 0) / allUserFeedback.length : Math.max(1, (place.rating ?? 0) - 0.2)} /></span><span>Overall experience <RatingStars rating={ratingValue} /></span></div></>}
             </div>
             <div className="review-list">
               {place.sampleReviews.map((review, index) => <blockquote className="review-card" key={`${place.id}-demo-${index}`}><span className="review-demo-label">SAMPLE REVIEW · NOT REAL TESTIMONY</span><p>“{review}”</p></blockquote>)}
               {feedback.map((item) => <blockquote className="review-card local-review-card" key={item.id}><span className="review-demo-label">LOCAL PROTOTYPE FEEDBACK</span><RatingStars rating={item.overall} /><p>“{item.text}”</p></blockquote>)}
+              {reviews.map((item) => <blockquote className="review-card member-review-card" key={item.id}><span className="member-review-label">{item.userName} · {new Date(item.createdAt).toLocaleDateString()}</span><RatingStars rating={item.overall} /><p>“{item.text}”</p></blockquote>)}
             </div>
-            <button className="outline-button feedback-cta" onClick={onFeedback}><MessageSquareText size={16} /> Leave feedback</button>
+            <button className="outline-button feedback-cta" onClick={onFeedback}><MessageSquareText size={16} /> Leave a review</button>
           </div>
           <div className="detail-section"><h2>About this place</h2><p className="about-copy">{place.about}</p></div>
           <div className="detail-section"><h2>Contact and hours</h2><div className="contact-list"><span className="contact-item"><Phone size={16} /> {place.phone}</span><span className="contact-item"><Mail size={16} /> {place.email}</span><span className="contact-item"><Building2 size={16} /> {place.website}</span></div>{place.hours.map((hour) => { const [day, time] = hour.split('|'); return <div className="hours-row" key={day}><span>{day}</span><strong>{time}</strong></div>; })}</div>
@@ -785,7 +810,7 @@ function Details({
             <button className={`primary-button${isSaved ? ' saved-primary' : ''}`} aria-pressed={isSaved} onClick={onToggleSaved}><Heart size={16} fill={isSaved ? 'currentColor' : 'none'} /> {isSaved ? 'Saved place' : 'Save place'}</button>
             <button className="outline-button" onClick={onDirections}><Navigation size={16} /> Get directions</button>
             <button className="outline-button" onClick={onContact}><Phone size={16} /> Contact institution</button>
-            <button className="outline-button" onClick={onFeedback}><MessageSquareText size={16} /> Leave feedback</button>
+            <button className="outline-button" onClick={onFeedback}><MessageSquareText size={16} /> Leave a review</button>
             <button className="report-link" onClick={onReport}><CircleAlert size={14} /> Report incorrect information</button>
           </div>
           <p className="sample-contact-note">All contact details in this profile are fictional demo values.</p>
@@ -801,13 +826,26 @@ function SavedPlaces({
   toggleSaved,
   openPlace,
   onDiscover,
+  isAuthenticated,
+  onLogin,
 }: {
   savedPlaces: Place[];
   savedIds: string[];
   toggleSaved: (place: Place) => void;
   openPlace: (place: Place) => void;
   onDiscover: () => void;
+  isAuthenticated: boolean;
+  onLogin: () => void;
 }) {
+  if (!isAuthenticated) {
+    return (
+      <main className="page-wrap app-main">
+        <div className="eyebrow" style={{ marginTop: 25 }}>Your shortlist</div>
+        <h1 className="page-title display">Saved places</h1>
+        <div className="empty-state account-empty-state"><Heart size={30} /><h2>Save places to your account.</h2><p>Log in to keep your shortlist available when you come back.</p><button className="primary-button" onClick={onLogin}>Log in to save places <ArrowRight size={16} /></button><button className="text-button" onClick={onDiscover}>Continue discovering</button></div>
+      </main>
+    );
+  }
   return (
     <main className="page-wrap app-main">
       <div className="eyebrow" style={{ marginTop: 25 }}>Your shortlist</div>
@@ -815,6 +853,38 @@ function SavedPlaces({
       <p className="page-intro">Keep useful places together so you can find their accessibility information again.</p>
       <div className="result-list saved-result-list">
         {savedPlaces.length ? savedPlaces.map((place) => <ResultCard key={place.id} place={place} open={() => openPlace(place)} isSaved={savedIds.includes(place.id)} onToggleSaved={() => toggleSaved(place)} />) : <div className="empty-state"><Heart size={30} /><h2>No saved places yet.</h2><p>Save accessible places here so you can find them quickly later.</p><button className="primary-button" onClick={onDiscover}>Discover places <ArrowRight size={16} /></button></div>}
+      </div>
+    </main>
+  );
+}
+
+function AuthPrompt({ kind, onClose, onLogin }: { kind: "save" | "review"; onClose: () => void; onLogin: () => void }) {
+  const isReview = kind === "review";
+  return (
+    <div className="modal-backdrop" role="presentation" onMouseDown={(event) => { if (event.target === event.currentTarget) onClose(); }}>
+      <section className="prototype-dialog auth-prompt" role="dialog" aria-modal="true" aria-labelledby="auth-prompt-title">
+        <button className="dialog-close" onClick={onClose} aria-label="Close dialog"><X size={20} /></button>
+        <div className="dialog-icon"><ShieldCheck size={22} /></div>
+        <div className="eyebrow">Personal FindAble features</div>
+        <h2 id="auth-prompt-title">{isReview ? "Log in to share your experience." : "Create an account to save places and access them later."}</h2>
+        <p className="about-copy">{isReview ? "Your name will appear with your review. Browsing and reading reviews stays open to everyone." : "Keep your saved institutions private to your account while continuing to browse without signing in."}</p>
+        <div className="form-actions auth-prompt-actions"><button className="primary-button" onClick={onLogin}>Log in</button><button className="outline-button" onClick={onLogin}>Create account</button></div>
+      </section>
+    </div>
+  );
+}
+
+function ProfilePage({ profile, savedCount, onSaved, onLogout }: { profile: Profile | null; savedCount: number; onSaved: () => void; onLogout: () => void }) {
+  return (
+    <main className="page-wrap app-main">
+      <div className="form-shell profile-page">
+        <div className="eyebrow">Your account</div>
+        <h1 className="page-title display">My Profile</h1>
+        {profile ? <div className="profile-card form-card">
+          <div className="profile-avatar-large">{profile.name.slice(0, 1).toUpperCase()}</div>
+          <div className="profile-data"><div><span className="profile-label">Name</span><strong>{profile.name}</strong></div><div><span className="profile-label">Email</span><strong>{profile.email ?? "Email provided by your sign-in account"}</strong></div><div><span className="profile-label">Account created</span><strong>{new Date(profile.createdAt).toLocaleDateString()}</strong></div></div>
+          <div className="profile-actions"><button className="outline-button" onClick={onSaved}>Saved places <span className="count-pill">{savedCount}</span></button><button className="text-button" onClick={onLogout}>Log out</button></div>
+        </div> : <div className="form-card"><p className="about-copy">Loading your account…</p></div>}
       </div>
     </main>
   );
@@ -832,7 +902,7 @@ function RatingControl({ label, value, onChange }: { label: string; value: numbe
   );
 }
 
-function FeedbackPage({ place, onCancel, onSubmit }: { place: Place; onCancel: () => void; onSubmit: (feedback: CommunityFeedback) => void }) {
+function FeedbackPage({ place, onCancel, onSubmit }: { place: Place; onCancel: () => void; onSubmit: (feedback: CommunityFeedback) => void | Promise<void> }) {
   const [overall, setOverall] = useState(5);
   const [communication, setCommunication] = useState(5);
   const [staffUnderstanding, setStaffUnderstanding] = useState(5);
@@ -847,16 +917,16 @@ function FeedbackPage({ place, onCancel, onSubmit }: { place: Place; onCancel: (
     <main className="page-wrap app-main">
       <Breadcrumb onBack={onCancel} label={`Back to ${place.name}`} />
       <div className="form-shell">
-        <div className="eyebrow">Community feedback · local prototype</div>
+        <div className="eyebrow">Community review · signed-in members</div>
         <h1 className="page-title display">Share your experience</h1>
-        <p className="page-intro">Your feedback will be stored only in this browser for this demo. It will not be sent to the institution or shown to other users.</p>
+        <p className="page-intro">Your review will show your account name and the date it was shared. It will not verify any accessibility claim.</p>
         <form className="form-card" onSubmit={submit}>
           <div className="feedback-place"><strong>{place.name}</strong><span>{place.category} · {place.location}</span></div>
           <RatingControl label="Overall experience" value={overall} onChange={setOverall} />
           <RatingControl label="Communication" value={communication} onChange={setCommunication} />
           <RatingControl label="Staff understanding" value={staffUnderstanding} onChange={setStaffUnderstanding} />
           <div className="field"><label htmlFor="feedback-text">Written feedback</label><textarea id="feedback-text" required minLength={5} maxLength={800} value={text} onChange={(event) => setText(event.target.value)} placeholder="What would help someone plan a visit here?" /><span className="form-hint">{text.length}/800 characters</span></div>
-          <div className="form-foot"><span className="form-hint">Prototype feedback does not verify any accessibility claims.</span><button className="primary-button" type="submit">Save feedback <ArrowRight size={16} /></button></div>
+          <div className="form-foot"><span className="form-hint">Member reviews are community experiences, not institution verification.</span><button className="primary-button" type="submit">Submit review <ArrowRight size={16} /></button></div>
         </form>
       </div>
     </main>
@@ -1007,98 +1077,157 @@ function PrototypeDialog({ kind, place, onClose }: { kind: 'directions' | 'conta
 }
 
 function App() {
-  const [screen, setScreen] = useState<Screen>('home');
-  const [query, setQuery] = useState('');
-  const [category, setCategory] = useState<Category | ''>('');
+  const auth = useAuth();
+  const [screen, setScreen] = useState<Screen>("home");
+  const [query, setQuery] = useState("");
+  const [category, setCategory] = useState<Category | "">("");
   const [selectedFeatures, setSelectedFeatures] = useState<Feature[]>([]);
   const [selectedPlace, setSelectedPlace] = useState<Place | null>(null);
-  const [detailsReturnTo, setDetailsReturnTo] = useState<Screen>('results');
-  const [contributionReturnTo, setContributionReturnTo] = useState<Screen>('home');
-  const [savedIds, setSavedIds] = useStoredState<string[]>('findable:saved-places', []);
-  const [communityPlaces, setCommunityPlaces] = useStoredState<Place[]>('findable:community-places', []);
-  const [feedbackByPlace, setFeedbackByPlace] = useStoredState<Record<string, CommunityFeedback[]>>('findable:community-feedback', {});
-  const [, setReports] = useStoredState<AccessibilityReport[]>('findable:accessibility-reports', []);
+  const [detailsReturnTo, setDetailsReturnTo] = useState<Screen>("results");
+  const [contributionReturnTo, setContributionReturnTo] = useState<Screen>("home");
+  const [savedIds, setSavedIds] = useState<string[]>([]);
+  const [communityPlaces, setCommunityPlaces] = useStoredState<Place[]>("findable:community-places", []);
+  const [feedbackByPlace, setFeedbackByPlace] = useStoredState<Record<string, CommunityFeedback[]>>("findable:community-feedback", {});
+  const [, setReports] = useStoredState<AccessibilityReport[]>("findable:accessibility-reports", []);
+  const [memberReviews, setMemberReviews] = useState<Record<string, UserReview[]>>({});
+  const [profile, setProfile] = useState<Profile | null>(null);
   const [comparisonIds, setComparisonIds] = useState<string[]>([]);
   const [comparisonOpen, setComparisonOpen] = useState(false);
   const [toast, setToast] = useState<string | null>(null);
-  const [submittedMode, setSubmittedMode] = useState<'suggestion' | 'report' | null>(null);
-  const [contributionMode, setContributionMode] = useState<ContributionMode>('choose');
+  const [authPrompt, setAuthPrompt] = useState<"save" | "review" | null>(null);
+  const [submittedMode, setSubmittedMode] = useState<"suggestion" | "report" | null>(null);
+  const [contributionMode, setContributionMode] = useState<ContributionMode>("choose");
   const [reportTarget, setReportTarget] = useState<Place | null>(null);
-  const [dialog, setDialog] = useState<{ kind: 'directions' | 'contact'; place: Place } | null>(null);
+  const [dialog, setDialog] = useState<{ kind: "directions" | "contact"; place: Place } | null>(null);
 
-  const navigate = (next: Screen) => { setScreen(next); window.scrollTo({ top: 0, behavior: 'smooth' }); };
+  const navigate = (next: Screen) => { setScreen(next); window.scrollTo({ top: 0, behavior: "smooth" }); };
   const toggleFeature = (feature: Feature) => setSelectedFeatures((current) => current.includes(feature) ? current.filter((item) => item !== feature) : [...current, feature]);
   const showToast = (message: string) => { setToast(message); window.setTimeout(() => setToast(null), 3800); };
   const allPlaces = useMemo(() => [...places, ...communityPlaces], [communityPlaces]);
-  const openPlace = (place: Place, returnTo: Screen = screen) => { setSelectedPlace(place); setDetailsReturnTo(returnTo); navigate('details'); };
-  const toggleSaved = (place: Place) => {
+
+  useEffect(() => {
+    if (!auth.isAuthenticated) {
+      setSavedIds([]);
+      setProfile(null);
+      return;
+    }
+    Promise.all([
+      fetch("/api/user/saved", { credentials: "include" }).then((response) => response.ok ? response.json() as Promise<{ placeIds: string[] }> : Promise.reject(new Error("Unable to load saved places"))),
+      fetch("/api/user/profile", { credentials: "include" }).then((response) => response.ok ? response.json() as Promise<Profile> : Promise.reject(new Error("Unable to load profile"))),
+    ]).then(([saved, account]) => {
+      setSavedIds(saved.placeIds);
+      setProfile(account);
+    }).catch(() => showToast("We could not load your account data. Please try again."));
+  }, [auth.isAuthenticated]);
+
+  useEffect(() => {
+    if (!selectedPlace) return;
+    fetch(`/api/places/${encodeURIComponent(selectedPlace.id)}/reviews`, { credentials: "include" })
+      .then((response) => response.ok ? response.json() as Promise<{ reviews: UserReview[] }> : Promise.reject(new Error("Unable to load reviews")))
+      .then((data) => setMemberReviews((current) => ({ ...current, [selectedPlace.id]: data.reviews })))
+      .catch(() => showToast("Member reviews are temporarily unavailable."));
+  }, [selectedPlace?.id]);
+
+  const openPlace = (place: Place, returnTo: Screen = screen) => { setSelectedPlace(place); setDetailsReturnTo(returnTo); navigate("details"); };
+  const toggleSaved = async (place: Place) => {
+    if (!auth.isAuthenticated) {
+      setAuthPrompt("save");
+      return;
+    }
     const isSaved = savedIds.includes(place.id);
+    const response = await fetch("/api/user/saved", {
+      method: isSaved ? "DELETE" : "POST",
+      credentials: "include",
+      headers: { "Content-Type": "application/json" },
+      body: JSON.stringify({ placeId: place.id }),
+    });
+    if (!response.ok) {
+      showToast("We could not update your saved places.");
+      return;
+    }
     setSavedIds((current) => isSaved ? current.filter((id) => id !== place.id) : [...current, place.id]);
-    showToast(isSaved ? `${place.name} removed from saved places.` : `${place.name} saved on this device.`);
+    showToast(isSaved ? `${place.name} removed from saved places.` : `${place.name} saved to your account.`);
   };
   const toggleComparison = (place: Place) => {
     if (comparisonIds.includes(place.id)) {
-      setComparisonIds((current) => current.filter((id) => id !== place.id));
+      setComparisonIds((current) => current.filter((item) => item !== place.id));
       return;
     }
     if (comparisonIds.length >= 2) {
-      showToast('Compare up to two places at a time.');
+      showToast("Compare up to two places at a time.");
       return;
     }
     setComparisonIds((current) => [...current, place.id]);
   };
   const openContribution = () => {
-    setContributionMode('choose');
+    setContributionMode("choose");
     setReportTarget(null);
     setSubmittedMode(null);
-    setContributionReturnTo('home');
-    navigate('contribute');
+    setContributionReturnTo("home");
+    navigate("contribute");
   };
   const openReport = (place: Place | null = null) => {
     setReportTarget(place);
-    setContributionMode('report');
+    setContributionMode("report");
     setSubmittedMode(null);
-    setContributionReturnTo(place ? 'details' : 'home');
-    navigate('contribute');
+    setContributionReturnTo(place ? "details" : "home");
+    navigate("contribute");
   };
   const submitPlace = (place: Place) => {
     setCommunityPlaces((current) => [place, ...current]);
-    showToast('Your place is saved locally as Pending Verification.');
+    showToast("Your place is saved locally as Pending Verification.");
   };
   const submitReport = (place: Place, message: string) => {
-    setReports((current) => [...current, { id: createId('report'), placeId: place.id, placeName: place.name, message, createdAt: new Date().toISOString() }]);
-    showToast('Your report is saved in this browser for the demo.');
+    setReports((current) => [...current, { id: createId("report"), placeId: place.id, placeName: place.name, message, createdAt: new Date().toISOString() }]);
+    showToast("Your report is saved in this browser for the demo.");
   };
-  const toggleFeedback = (placeId: string, feedback: CommunityFeedback) => {
-    setFeedbackByPlace((current) => ({ ...current, [placeId]: [...(current[placeId] ?? []), feedback] }));
-    showToast('Your feedback is saved locally in this browser.');
-    navigate('details');
+  const submitReview = async (placeId: string, feedback: CommunityFeedback) => {
+    const response = await fetch(`/api/places/${encodeURIComponent(placeId)}/reviews`, {
+      method: "POST",
+      credentials: "include",
+      headers: { "Content-Type": "application/json" },
+      body: JSON.stringify(feedback),
+    });
+    if (!response.ok) {
+      showToast("We could not submit your review. Please try again.");
+      return;
+    }
+    const review = await response.json() as UserReview;
+    setMemberReviews((current) => ({ ...current, [placeId]: [...(current[placeId] ?? []), review] }));
+    showToast("Your review was added to this place.");
+    navigate("details");
   };
   const filteredPlaces = useMemo(() => {
     const normalized = query.trim().toLowerCase();
     return allPlaces.filter((place) => {
       const searchable = `${place.name} ${place.category} ${place.location} ${place.address}`.toLowerCase();
-      const matchesText = !normalized || searchable.includes(normalized);
-      const matchesCategory = !category || category === place.category;
-      const matchesFeatures = selectedFeatures.every((feature) => place.features[feature] === 'available');
-      return matchesText && matchesCategory && matchesFeatures;
+      return (!normalized || searchable.includes(normalized)) && (!category || category === place.category) && selectedFeatures.every((feature) => place.features[feature] === "available");
     });
   }, [allPlaces, query, category, selectedFeatures]);
 
+  const openFeedback = () => {
+    if (!auth.isAuthenticated) {
+      setAuthPrompt("review");
+      return;
+    }
+    navigate("feedback");
+  };
   const navigateFromMenu = (next: Screen) => {
-    if (next === 'contribute') openContribution();
+    if (next === "contribute") openContribution();
+    else if (next === "profile" && !auth.isAuthenticated) setAuthPrompt("review");
     else navigate(next);
   };
   let content: ReactNode = null;
-  if (screen === 'home') content = <Home query={query} setQuery={setQuery} onSearch={() => navigate('results')} onCategory={(value) => { setCategory(value); navigate('results'); }} onLocation={() => showToast('This prototype uses sample Nairobi locations and does not access your device location.')} navigate={navigateFromMenu} />;
-  if (screen === 'search') content = <SearchPage query={query} setQuery={setQuery} category={category} setCategory={setCategory} selectedFeatures={selectedFeatures} toggleFeature={toggleFeature} onSubmit={() => navigate('results')} onBack={() => navigate('home')} />;
-  if (screen === 'results') content = <Results query={query} setQuery={setQuery} category={category} setCategory={setCategory} selectedFeatures={selectedFeatures} toggleFeature={toggleFeature} filteredPlaces={filteredPlaces} openPlace={(place) => openPlace(place, 'results')} savedIds={savedIds} toggleSaved={toggleSaved} comparisonIds={comparisonIds} toggleComparison={toggleComparison} comparisonOpen={comparisonOpen} setComparisonOpen={setComparisonOpen} onBack={() => navigate('search')} />;
-  if (screen === 'details' && selectedPlace) content = <Details place={selectedPlace} feedback={feedbackByPlace[selectedPlace.id] ?? []} isSaved={savedIds.includes(selectedPlace.id)} onToggleSaved={() => toggleSaved(selectedPlace)} onBack={() => navigate(detailsReturnTo)} onDirections={() => setDialog({ kind: 'directions', place: selectedPlace })} onContact={() => setDialog({ kind: 'contact', place: selectedPlace })} onReport={() => openReport(selectedPlace)} onFeedback={() => navigate('feedback')} />;
-  if (screen === 'saved') content = <SavedPlaces savedPlaces={allPlaces.filter((place) => savedIds.includes(place.id))} savedIds={savedIds} toggleSaved={toggleSaved} openPlace={(place) => openPlace(place, 'saved')} onDiscover={() => navigate('search')} />;
-  if (screen === 'feedback' && selectedPlace) content = <FeedbackPage place={selectedPlace} onCancel={() => navigate('details')} onSubmit={(feedback) => toggleFeedback(selectedPlace.id, feedback)} />;
-  if (screen === 'contribute') content = <Contribution mode={contributionMode} setMode={setContributionMode} reportTarget={reportTarget} allPlaces={allPlaces} onBack={() => navigate(contributionReturnTo)} onReturnHome={() => navigate('home')} submittedMode={submittedMode} setSubmittedMode={setSubmittedMode} submitPlace={submitPlace} submitReport={submitReport} />;
+  if (screen === "home") content = <Home query={query} setQuery={setQuery} onSearch={() => navigate("results")} onCategory={(value) => { setCategory(value); navigate("results"); }} onLocation={() => showToast("This prototype uses sample Nairobi locations and does not access your device location.")} navigate={navigateFromMenu} />;
+  if (screen === "search") content = <SearchPage query={query} setQuery={setQuery} category={category} setCategory={setCategory} selectedFeatures={selectedFeatures} toggleFeature={toggleFeature} onSubmit={() => navigate("results")} onBack={() => navigate("home")} />;
+  if (screen === "results") content = <Results query={query} setQuery={setQuery} category={category} setCategory={setCategory} selectedFeatures={selectedFeatures} toggleFeature={toggleFeature} filteredPlaces={filteredPlaces} openPlace={(place) => openPlace(place, "results")} savedIds={savedIds} toggleSaved={(place) => { void toggleSaved(place); }} comparisonIds={comparisonIds} toggleComparison={toggleComparison} comparisonOpen={comparisonOpen} setComparisonOpen={setComparisonOpen} onBack={() => navigate("search")} />;
+  if (screen === "details" && selectedPlace) content = <Details place={selectedPlace} feedback={feedbackByPlace[selectedPlace.id] ?? []} reviews={memberReviews[selectedPlace.id] ?? []} isSaved={savedIds.includes(selectedPlace.id)} onToggleSaved={() => { void toggleSaved(selectedPlace); }} onBack={() => navigate(detailsReturnTo)} onDirections={() => setDialog({ kind: "directions", place: selectedPlace })} onContact={() => setDialog({ kind: "contact", place: selectedPlace })} onReport={() => openReport(selectedPlace)} onFeedback={openFeedback} />;
+  if (screen === "saved") content = <SavedPlaces savedPlaces={allPlaces.filter((place) => savedIds.includes(place.id))} savedIds={savedIds} toggleSaved={(place) => { void toggleSaved(place); }} openPlace={(place) => openPlace(place, "saved")} onDiscover={() => navigate("search")} isAuthenticated={auth.isAuthenticated} onLogin={auth.login} />;
+  if (screen === "feedback" && selectedPlace) content = <FeedbackPage place={selectedPlace} onCancel={() => navigate("details")} onSubmit={(feedback) => submitReview(selectedPlace.id, feedback)} />;
+  if (screen === "contribute") content = <Contribution mode={contributionMode} setMode={setContributionMode} reportTarget={reportTarget} allPlaces={allPlaces} onBack={() => navigate(contributionReturnTo)} onReturnHome={() => navigate("home")} submittedMode={submittedMode} setSubmittedMode={setSubmittedMode} submitPlace={submitPlace} submitReport={submitReport} />;
+  if (screen === "profile") content = <ProfilePage profile={profile} savedCount={savedIds.length} onSaved={() => navigate("saved")} onLogout={auth.logout} />;
 
-  return <div className="app-shell"><Header navigate={navigateFromMenu} />{content}{dialog && <PrototypeDialog kind={dialog.kind} place={dialog.place} onClose={() => setDialog(null)} />}{toast && <div className="toast" role="status"><Check size={17} /><span>{toast}</span><button aria-label="Dismiss notification" onClick={() => setToast(null)}><X size={16} /></button></div>}</div>;
+  return <div className="app-shell"><Header navigate={navigateFromMenu} auth={auth} />{content}{dialog && <PrototypeDialog kind={dialog.kind} place={dialog.place} onClose={() => setDialog(null)} />}{authPrompt && <AuthPrompt kind={authPrompt} onClose={() => setAuthPrompt(null)} onLogin={auth.login} />}{toast && <div className="toast" role="status"><Check size={17} /><span>{toast}</span><button aria-label="Dismiss notification" onClick={() => setToast(null)}><X size={16} /></button></div>}</div>;
 }
 
 export default App;

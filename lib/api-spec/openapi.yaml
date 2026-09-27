@@ -10,6 +10,10 @@ servers:
 tags:
   - name: health
     description: Health operations
+  - name: Auth
+    description: Browser authentication endpoints.
+  - name: User data
+    description: Authenticated FindAble user data.
 paths:
   /healthz:
     get:
@@ -24,8 +28,244 @@ paths:
             application/json:
               schema:
                 $ref: "#/components/schemas/HealthStatus"
+  /auth/user:
+    get:
+      tags: [Auth]
+      operationId: getCurrentAuthUser
+      summary: Get the currently authenticated user
+      responses:
+        "200":
+          description: Auth status resolved successfully.
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/AuthUserEnvelope"
+  /login:
+    get:
+      tags: [Auth]
+      operationId: beginBrowserLogin
+      summary: Start browser authentication
+      responses:
+        "302":
+          description: Redirect to the authentication provider.
+  /callback:
+    get:
+      tags: [Auth]
+      operationId: handleBrowserLoginCallback
+      summary: Complete browser authentication
+      responses:
+        "302":
+          description: Redirect back to the FindAble app.
+  /logout:
+    get:
+      tags: [Auth]
+      operationId: logoutBrowserSession
+      summary: Log out the current browser session
+      responses:
+        "302":
+          description: Redirect back to the FindAble app.
+  /user/saved:
+    get:
+      tags: [User data]
+      operationId: listSavedPlaces
+      summary: List saved place IDs for the current user
+      responses:
+        "200":
+          description: Saved place IDs.
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/SavedPlacesEnvelope"
+        "401":
+          description: Authentication required.
+  /user/profile:
+    get:
+      tags: [User data]
+      operationId: getUserProfile
+      summary: Get the current user's profile
+      responses:
+        "200":
+          description: The current user's profile.
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/UserProfile"
+        "401":
+          description: Authentication required.
+    post:
+      tags: [User data]
+      operationId: savePlace
+      summary: Save a place for the current user
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: "#/components/schemas/PlaceIdRequest"
+      responses:
+        "204":
+          description: Place saved.
+        "401":
+          description: Authentication required.
+    delete:
+      tags: [User data]
+      operationId: unsavePlace
+      summary: Remove a saved place for the current user
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: "#/components/schemas/PlaceIdRequest"
+      responses:
+        "204":
+          description: Place removed.
+        "401":
+          description: Authentication required.
+  /places/{placeId}/reviews:
+    get:
+      tags: [User data]
+      operationId: listPlaceReviews
+      summary: List authenticated reviews for a place
+      parameters:
+        - name: placeId
+          in: path
+          required: true
+          schema:
+            type: string
+      responses:
+        "200":
+          description: Reviews for the place.
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/ReviewsEnvelope"
+    post:
+      tags: [User data]
+      operationId: createPlaceReview
+      summary: Create a review for a place
+      parameters:
+        - name: placeId
+          in: path
+          required: true
+          schema:
+            type: string
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: "#/components/schemas/CreateReviewRequest"
+      responses:
+        "201":
+          description: Review created.
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/Review"
+        "401":
+          description: Authentication required.
 components:
   schemas:
+    AuthUser:
+      type: object
+      required: [id, email, firstName, lastName, profileImageUrl]
+      properties:
+        id:
+          type: string
+        email:
+          type: [string, "null"]
+          format: email
+        firstName:
+          type: [string, "null"]
+        lastName:
+          type: [string, "null"]
+        profileImageUrl:
+          type: [string, "null"]
+    AuthUserEnvelope:
+      type: object
+      required: [user]
+      properties:
+        user:
+          oneOf:
+            - $ref: "#/components/schemas/AuthUser"
+            - type: "null"
+    PlaceIdRequest:
+      type: object
+      required: [placeId]
+      properties:
+        placeId:
+          type: string
+          minLength: 1
+    SavedPlacesEnvelope:
+      type: object
+      required: [placeIds]
+      properties:
+        placeIds:
+          type: array
+          items:
+            type: string
+    CreateReviewRequest:
+      type: object
+      required: [overall, communication, staffUnderstanding, text]
+      properties:
+        overall:
+          type: integer
+          minimum: 1
+          maximum: 5
+        communication:
+          type: integer
+          minimum: 1
+          maximum: 5
+        staffUnderstanding:
+          type: integer
+          minimum: 1
+          maximum: 5
+        text:
+          type: string
+          minLength: 5
+          maxLength: 1000
+    Review:
+      type: object
+      required: [id, userName, overall, communication, staffUnderstanding, text, createdAt]
+      properties:
+        id:
+          type: string
+        userName:
+          type: string
+        overall:
+          type: integer
+        communication:
+          type: integer
+        staffUnderstanding:
+          type: integer
+        text:
+          type: string
+        createdAt:
+          type: string
+          format: date-time
+    ReviewsEnvelope:
+      type: object
+      required: [reviews]
+      properties:
+        reviews:
+          type: array
+          items:
+            $ref: "#/components/schemas/Review"
+    UserProfile:
+      type: object
+      required: [id, name, email, createdAt]
+      properties:
+        id:
+          type: string
+        name:
+          type: string
+        email:
+          type: [string, "null"]
+          format: email
+        createdAt:
+          type: string
+          format: date-time
     HealthStatus:
       type: object
       properties:

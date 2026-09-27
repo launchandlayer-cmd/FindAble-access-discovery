@@ -78,6 +78,14 @@ button:focus-visible, input:focus-visible, select:focus-visible, textarea:focus-
 .header-links { display: flex; align-items: center; gap: 28px; }
 .header-link { color: #52615d; font-size: 14px; font-weight: 600; border: 0; background: transparent; }
 .header-link:hover { color: #1d5f59; }
+.auth-link { margin-left: -12px; }
+.small-primary-button { display: inline-flex; align-items: center; justify-content: center; min-height: 38px; padding: 0 13px; border: 0; border-radius: 10px; color: #fffaf0; background: #1d7168; font-size: 13px; font-weight: 800; }
+.small-primary-button:hover { background: #165b55; }
+.account-control { display: inline-flex; align-items: center; gap: 8px; padding: 5px 10px 5px 5px; border: 1px solid #cbd8ce; border-radius: 999px; color: #29423e; background: #f9fbf8; font-size: 13px; font-weight: 800; }
+.account-control:hover { border-color: #99bdb1; background: #eef5ee; }
+.account-avatar, .profile-avatar-large { display: grid; place-items: center; border-radius: 50%; color: #fffaf0; background: #c15c49; font-weight: 800; }
+.account-avatar { width: 27px; height: 27px; font-size: 12px; }
+.account-loading { color: #74807b; font-size: 12px; font-weight: 700; }
 .pill-button, .primary-button, .ghost-button, .outline-button {
   display: inline-flex; align-items: center; justify-content: center; gap: 9px; min-height: 45px;
   border-radius: 11px; padding: 0 17px; border: 1px solid transparent; font-weight: 700; font-size: 14px;
@@ -369,6 +377,9 @@ button:focus-visible, input:focus-visible, select:focus-visible, textarea:focus-
 .review-card p { margin: 7px 0 0; color: #435852; font-size: 14px; line-height: 1.6; }
 .review-demo-label { display: inline-block; color: #8a5b35; font-size: 9px; font-weight: 900; letter-spacing: .08em; }
 .local-review-card .rating-stars { margin-top: 8px; }
+.member-review-card { border-color: #b7d4c9; background: #f4faf6; }
+.member-review-label { display: inline-block; color: #1d7168; font-size: 10px; font-weight: 900; letter-spacing: .04em; }
+.member-review-card .rating-stars { margin-top: 8px; }
 .feedback-cta { margin-top: 16px; }
 .sample-contact-note { margin: 16px 0 0; color: #80523d; font-size: 11px; line-height: 1.5; }
 .saved-result-list { margin-top: 27px; }
@@ -379,6 +390,19 @@ button:focus-visible, input:focus-visible, select:focus-visible, textarea:focus-
 .rating-choice.chosen { color: #a46418; background: #fff5e5; }
 .feedback-place { display: grid; gap: 4px; padding: 13px 15px; margin-bottom: 12px; border-radius: 11px; color: #29423e; background: #eef4ee; }
 .feedback-place span { color: #64746d; font-size: 12px; }
+.account-empty-state { max-width: 520px; margin-top: 34px; }
+.account-empty-state .text-button { margin-top: 9px; }
+.auth-prompt-actions { margin-top: 22px; }
+.auth-prompt-actions > * { flex: 1; }
+.profile-page { max-width: 680px; }
+.profile-card { display: grid; grid-template-columns: auto 1fr; gap: 20px; align-items: start; margin-top: 30px; }
+.profile-avatar-large { width: 58px; height: 58px; font-size: 22px; }
+.profile-data { display: grid; gap: 16px; }
+.profile-data > div { display: grid; gap: 4px; }
+.profile-label { color: #74807b; font-size: 11px; font-weight: 800; letter-spacing: .08em; text-transform: uppercase; }
+.profile-data strong { overflow-wrap: anywhere; color: #29423e; font-size: 15px; }
+.profile-actions { grid-column: 1 / -1; display: flex; flex-wrap: wrap; align-items: center; gap: 12px; border-top: 1px solid #e0e2da; padding-top: 18px; }
+.count-pill { display: inline-grid; place-items: center; min-width: 21px; height: 21px; padding: 0 5px; border-radius: 999px; color: #1d7168; background: #e1eeea; font-size: 11px; }
 .contribution-options { display: grid; grid-template-columns: 1fr 1fr; gap: 14px; margin: 28px 0 15px; }
 .contribution-option { display: grid; justify-items: start; gap: 12px; min-height: 200px; padding: 21px; border: 1px solid #dbe1d8; border-radius: 17px; color: #29423e; background: #fbfaf5; text-align: left; transition: transform .2s ease, box-shadow .2s ease, border-color .2s ease; }
 .contribution-option:hover { transform: translateY(-3px); border-color: #99bdb1; box-shadow: var(--shadow-sm); }
@@ -408,6 +432,9 @@ button:focus-visible, input:focus-visible, select:focus-visible, textarea:focus-
   .header-links.menu-open .header-link { display: flex; width: 100%; padding: 12px; border-radius: 9px; text-align: left; }
   .header-links.menu-open .header-link:hover { background: #eef5ee; }
   .header-links.menu-open .pill-button { display: inline-flex; width: 100%; }
+  .header-links.menu-open .auth-link { margin-left: 0; }
+  .header-links.menu-open .account-control, .header-links.menu-open .small-primary-button { width: 100%; justify-content: flex-start; border-radius: 9px; padding: 10px 12px; }
+  .header-links.menu-open .account-control { border-color: transparent; }
   .header-links.menu-open .mobile-menu { align-self: flex-end; }
   .result-card { grid-template-columns: 1fr; }
   .result-actions { display: grid; grid-template-columns: 1fr 1fr; min-width: 0; }
@@ -429,4 +456,6 @@ button:focus-visible, input:focus-visible, select:focus-visible, textarea:focus-
   .contribution-options { grid-template-columns: 1fr; }
   .form-actions, .form-actions > * { width: 100%; }
   .prototype-dialog { padding: 24px 20px; }
+  .profile-card { grid-template-columns: 1fr; }
+  .profile-actions { grid-column: auto; }
 }

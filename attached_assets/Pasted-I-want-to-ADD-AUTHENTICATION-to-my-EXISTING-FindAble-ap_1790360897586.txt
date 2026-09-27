@@ -1,0 +1,268 @@
+I want to ADD AUTHENTICATION to my EXISTING FindAble app.
+
+IMPORTANT:
+Do NOT rebuild the application.
+Do NOT change the core FindAble concept.
+Do NOT remove or break any existing pages, features, styling, sample data, search, filters, institution profiles, saved places, or other functionality.
+
+The current app is a prototype for FindAble, an accessibility discovery platform that helps Deaf people discover and evaluate institutions with accessible communication before they visit.
+
+==================================================
+AUTHENTICATION
+==================================================
+
+Add a simple, polished authentication system with:
+
+1. Sign Up
+2. Log In
+3. Log Out
+4. Forgot Password / Reset Password
+5. Persistent user session
+
+Users should be able to create an account using:
+
+- Name
+- Email
+- Password
+
+Do not require unnecessary information during registration.
+
+==================================================
+AUTHENTICATION UI
+==================================================
+
+Add a "Log in" button and "Sign up" button to the existing navigation.
+
+Do not make authentication the focus of the homepage.
+
+The existing FindAble homepage and discovery experience should remain accessible.
+
+Create clean authentication pages/modals that match the existing FindAble design.
+
+Login fields:
+
+Email
+Password
+
+Buttons:
+
+Log in
+Forgot password?
+Create an account
+
+Sign-up fields:
+
+Full name
+Email
+Password
+Confirm password
+
+Button:
+
+Create account
+
+After successful registration, automatically log the user in and take them to the FindAble discovery experience.
+
+After successful login, return the user to the page they were trying to access, where appropriate.
+
+==================================================
+USER PROFILE / ACCOUNT
+==================================================
+
+After logging in, replace the Log in / Sign up buttons with a simple account control showing the user's name.
+
+When clicked, provide:
+
+My Profile
+Saved Places
+Log out
+
+Create a simple profile page containing:
+
+Name
+Email
+Account creation date
+
+Keep it minimal. This is a prototype, so do not build an unnecessary social profile.
+
+==================================================
+PROTECT SAVED PLACES
+==================================================
+
+Connect authentication to the existing Saved Places feature.
+
+A user's saved institutions should belong to their account rather than being shared between users.
+
+When a logged-in user saves a place:
+
+Save it to that user's account.
+
+When they log in again:
+
+Their saved places should still be available.
+
+If a user who is NOT logged in tries to save a place, show a small prompt:
+
+"Create an account to save places and access them later."
+
+Buttons:
+
+Log in
+Create account
+
+Do NOT force users to create an account just to browse or search FindAble.
+
+The core discovery experience must remain available without authentication.
+
+==================================================
+PROTECT USER-SPECIFIC ACTIONS
+==================================================
+
+Authentication should be required for actions that need a user identity, such as:
+
+- Saving places
+- Leaving a review
+- Managing their profile
+
+Browsing institutions, searching, filtering, and viewing institution profiles should NOT require authentication.
+
+==================================================
+REVIEWS
+==================================================
+
+Connect the existing "Leave a review" functionality to authentication.
+
+If the user is not logged in and clicks "Leave a review":
+
+Show:
+
+"Log in to share your experience."
+
+Buttons:
+
+Log in
+Create account
+
+If logged in, allow them to submit a review.
+
+A review should display:
+
+User's name
+Rating
+Review text
+Date
+
+Do not allow anonymous reviews through the authenticated review system.
+
+==================================================
+DATABASE / SECURITY
+==================================================
+
+Use the authentication/database technology that is already configured in the Replit project if one exists.
+
+If authentication infrastructure does not exist yet, use a secure, standard authentication solution supported by the current Replit environment.
+
+Do NOT store plaintext passwords.
+
+Use proper password hashing/authentication mechanisms.
+
+Protect user-specific data so one user cannot access another user's:
+
+- Saved places
+- Profile information
+- Reviews or private account data
+
+Do not expose authentication credentials, tokens, or sensitive user information in the frontend.
+
+==================================================
+DEMO / PROTOTYPE CONSIDERATIONS
+==================================================
+
+This is still an ALA prototype, so keep authentication simple.
+
+Do NOT add:
+
+- Social login unless already supported and easy to implement
+- Complex roles
+- Admin dashboards
+- Messaging
+- Social networking
+- Profiles with unnecessary fields
+- Complicated onboarding
+
+The purpose of authentication is to demonstrate that FindAble can provide personalized features such as saved places and community reviews.
+
+==================================================
+NAVIGATION
+==================================================
+
+Logged OUT:
+
+FindAble
+Discover
+Saved Places
+Add / Report
+Log in
+Sign up
+
+Logged IN:
+
+FindAble
+Discover
+Saved Places
+Add / Report
+[User name / Account]
+    My Profile
+    Log out
+
+Keep the existing navigation style.
+
+==================================================
+IMPORTANT UX RULE
+==================================================
+
+Do NOT put authentication between the user and FindAble's main purpose.
+
+A first-time visitor should be able to:
+
+Open FindAble
+Search
+Filter institutions
+View accessibility information
+Read reviews
+Evaluate places
+
+WITHOUT creating an account.
+
+Authentication should become relevant when the user wants personalized functionality such as:
+
+Save
+Review
+Profile
+
+==================================================
+FINAL TEST
+==================================================
+
+After implementing authentication, test the following:
+
+1. User can create an account.
+2. User can log in.
+3. User can log out.
+4. User can reset their password.
+5. User session persists after refreshing the page.
+6. Logged-out users can still browse/search FindAble.
+7. Logged-out users cannot save places or submit reviews without being prompted to log in.
+8. Logged-in users can save places.
+9. Saved places persist for that specific account.
+10. Logged-in users can submit reviews.
+11. User's name appears correctly on their reviews.
+12. Users cannot access another user's saved places or private information.
+13. Existing FindAble functionality remains intact.
+14. Existing styling and responsive design remain intact.
+15. No existing routes or components are unnecessarily removed or rebuilt.
+
+The final result should feel like the same FindAble prototype, just with a clean authentication layer added on top.
+
+DO NOT rebuild the existing app.
+ADD authentication to what is already there.

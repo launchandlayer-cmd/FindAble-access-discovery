@@ -1,6 +1,6 @@
-# [Project name]
+# FindAble
 
-_Replace the heading above with the project's name, and this line with one sentence describing what this app does for users._
+FindAble helps Deaf people discover institutions with communication-access information before visiting.
 
 ## Run & Operate
 
@@ -26,11 +26,13 @@ _Populate as you build — short repo map plus pointers to the source-of-truth f
 
 ## Architecture decisions
 
-_Populate as you build — non-obvious choices a reader couldn't infer from the code (3-5 bullets)._
+- Discovery remains public; authentication is introduced only for personalized actions such as saved places, reviews, and the account page.
+- Browser sessions use the platform-managed OIDC flow with httpOnly database-backed sessions; FindAble does not collect or store passwords.
+- Saved places and member reviews are scoped by the authenticated user ID in PostgreSQL, while fictional institution listings remain frontend demo data.
 
 ## Product
 
-_Describe the high-level user-facing capabilities of this app once they exist._
+FindAble includes public search, category and accessibility filters, comparison, institution profiles, saved places, account profiles, member reviews, and local prototype contributions. Institution listings, verification states, ratings, and sample reviews are clearly marked as demo content.
 
 ## User preferences
 
